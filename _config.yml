@@ -1,0 +1,51 @@
+title: "KMPizza"
+author: "Lena Stepanova"
+subtitle: "This is Lena.
+She loves Kotlin Multiplatform and pizza.
+And while she definitely won't share her pizza with you, she'd be glad to share her KMP experience.
+This blog is all about KMP, mobile apps and pizza."
+description: "All the tomatoes thrown at the author will be used for marinara sauce."
+permalink: /:title/
+lang: "en"
+excerpt_separator: "\n\n\n"
+date_format: "%B %d, %Y"
+
+# Layout
+
+show_excerpts: true        # show article excerpts on the home page
+show_frame: true           # adds a gray frame to the site
+show_sidebar: true        # show a sidebar instead of the usual header
+minimal: false             # use a dark header
+
+# Menu
+
+navigation:                # accepts {file, title, url, icon, sidebaricon}
+# - {file: "index.html"}
+# - {file: "README.md"}
+# - {file: "about.html"}
+
+external:                  # shows a footer with social links - for available icons see fontawesome.com/icons
+- {title: Github, icon: github, url: "https://github.com/hlnstepanova"}
+- {title: Twitter, icon: twitter, url: "https://twitter.com/hlnstep"}
+- {title: LinkedIn, icon: linkedin, url: "https://linkedin/hlnstepanova"}
+
+comments:
+#  disqus_shortname: ""    # see https://disqus.com/
+#  isso_domain: ""         # see https://posativ.org/isso/
+
+plugins:
+- jekyll-feed
+- jekyll-seo-tag
+- jemoji
+
+exclude:
+- .sass-cache/
+- .jekyll-cache/
+- gemfiles/
+- Gemfile
+- Gemfile.lock
+- node_modules/
+- vendor/bundle/
+- vendor/cache/
+- vendor/gems/
+- vendor/ruby/

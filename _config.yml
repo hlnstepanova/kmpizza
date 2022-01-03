@@ -9,6 +9,9 @@ permalink: /:title/
 lang: "en"
 excerpt_separator: "\n\n\n"
 date_format: "%B %d, %Y"
+url: https://hlnstepanova.github.io
+baseurl: /kmpizza
+destination: ./docs 
 
 # Layout
 

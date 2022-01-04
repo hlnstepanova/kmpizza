@@ -9,4 +9,9 @@ It’s particularly great for mobile developers, because it can help us leverage
  
 I’ve spent a lot of time researching on KMP, struggling through gradle files and dependencies, building apps for work and for myself and would love to share my experience with everyone else who’s interested.
  
-So stay tuned, stock up with pizza ingredients and let’s explore the exciting world of KMP together! 🤓
+So stock up with pizza ingredients and let’s explore the exciting world of KMP together! 🤓
+
+This repository will accompany each step of the blog: [KMPizza Repo](https://github.com/hlnstepanova/kmpizza-repo)
+
+![Photo by Ivan Torres on Unsplash](/assets/images/intro/pizza.jpg)
+  

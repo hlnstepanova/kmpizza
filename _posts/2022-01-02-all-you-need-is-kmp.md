@@ -13,5 +13,5 @@ So stock up with pizza ingredients and let’s explore the exciting world of KMP
 
 This repository will accompany each step of the blog: [KMPizza Repo](https://github.com/hlnstepanova/kmpizza-repo)
 
-![Photo by Ivan Torres on Unsplash](/assets/images/intro/pizza.jpg)
+![Photo by Ivan Torres on Unsplash]({{site.baseurl}}/assets/images/intro/pizza.jpg)
   

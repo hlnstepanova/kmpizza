@@ -1,6 +1,7 @@
 ---
 title:  "Intro: All you need is KMP (and pizza)" 
 layout: post
+sticky: true
 categories: motivation introductory
 --- 
 What is Kotlin Multiplatform? In short, it's the future of mobile development. You don’t believe me? Let me try to persuade you: Kotlin Multiplatform is still young, but it’s a very promising technology. It allows developers to share parts of code between different platforms, whether it's your backend, or an iOS app, or an Android app, or even a web or desktop. Kotlin will find its way anywhere. 
@@ -13,5 +14,7 @@ So stock up with pizza ingredients and let’s explore the exciting world of KMP
 
 This repository will accompany each step of the blog: [KMPizza Repo](https://github.com/hlnstepanova/kmpizza-repo)
 
-![Photo by Ivan Torres on Unsplash]({{site.baseurl}}/assets/images/intro/pizza.jpg)
+{% include overview.html %}
+
+![Photo by Ivan Torres on Unsplash]({{site.baseurl}}/assets/images/intro/pizza.jpg) 
   

@@ -14,7 +14,12 @@ So stock up with pizza ingredients and let’s explore the exciting world of KMP
 
 This repository will accompany each step of the blog: [KMPizza Repo](https://github.com/hlnstepanova/kmpizza-repo)
 
-{% include overview.html %}
+{% include overview.html %} 
 
 ![Photo by Ivan Torres on Unsplash]({{site.baseurl}}/assets/images/intro/pizza.jpg) 
+
+This project is inspired by:<br>
+[KaMPKit](https://github.com/touchlab/KaMPKit)<br>
+[MultiplatformPlayground](https://github.com/halcyonmobile/MultiplatformPlayground)<br>
+
   

@@ -11,9 +11,9 @@
 {% for post in posts %}
 {% unless post.sticky %}
   <article>
-    {% include meta.html post=post preview=true %}
-    {{ post.excerpt }}
-    <!--<div class="more"><a href="{{ post.url | relative_url }}">read more</a></div>!-->
+    {% include meta.html post=post preview=false %}
+    {{ post.content}}
+    <!--<div class="more"><a href="{{ post.url | relative_url }}">continue reading</a>!-->
   </article>
   {% endunless %}
 {% endfor %}

@@ -21,5 +21,6 @@ This repository will accompany each step of the blog: [KMPizza Repo](https://git
 This project is inspired by:<br>
 [KaMPKit](https://github.com/touchlab/KaMPKit)<br>
 [MultiplatformPlayground](https://github.com/halcyonmobile/MultiplatformPlayground)<br>
+[PeopleInSpace](https://github.com/joreilly/PeopleInSpace)<br>
 
   

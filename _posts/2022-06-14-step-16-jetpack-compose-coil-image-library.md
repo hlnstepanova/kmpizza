@@ -111,7 +111,7 @@ public fun RecipeDetailsScreen(recipeId: Long, upPress: () -> Unit) [1] {
 [2] For now just like in `RecipesScreen` we use the `RecipeViewModel`.<br>
 [3] We get all the recipes from `RecipeViewModel` and find the one we want by the id that we’ve passed from `RecipesScreen`. It’s not the perfect solution, but we’ll touch it up later.<br>
 
-<b><i>Check out the project repo for full code.</b></i>
+<b><i>Check out the project repo for full code.</i></b>
  
 Look at the `SectionHeader` composable:
 {% highlight kotlin %} 

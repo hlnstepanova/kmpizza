@@ -102,9 +102,10 @@ fun RecipeListItemPreview(
 {% endhighlight %} 
 
 
-Build and run the app. Click on a recipe list item. You’re in the `RecipeDetailScreen` now.
+Build and run the app. Click on a recipe list item. <br>
+You’re in the `RecipeDetailScreen` now.
 
-<img src="{{site.baseurl}}/assets/images/step-17/1.png" alt="open ContentView" width="300"/>
+<div style="text-align: center"><img src="{{site.baseurl}}/assets/images/step-17/1.png" alt="open ContentView" width="300"/></div>
 
 Now let’s go back to the recipe screen.<br>
 Wait, what? <br>

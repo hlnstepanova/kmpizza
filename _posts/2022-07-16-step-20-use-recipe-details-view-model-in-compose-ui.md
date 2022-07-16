@@ -208,4 +208,4 @@ fun resetUpload(){
 
 The Recipe Details View Model is ready!<br>
  Now we can add new recipes to the database!<br>
-<b>In the next step</b> we’ll <b>connect</b> this <b>ViewModel</b> to our Android <b>ompose UI</b>.
+<b>In the next step</b> we’ll <b>connect</b> this <b>ViewModel</b> to our Android <b>compose UI</b>.

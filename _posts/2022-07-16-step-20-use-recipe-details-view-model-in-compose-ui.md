@@ -3,209 +3,149 @@ title: "Step 20: Connect shared RecipeDetails ViewModel to Android Compose UI"
 layout: post
 categories: kmm shared viewmodel ktor koin
 --- 
+Now that we have a shared `RecipeDetailsViewModel` it's time to build the UI, and we'll start with Android.
 
-Now let’s create a proper `ViewModel` for the `RecipeDetails` screen. Keep in mind that we’ll also reuse this `ViewModel` to add new recipes afterwards.
-
-First in the `shared` module in the `model` folder add an `RecipeUiModel`, which we’ll use as an interface between <b>shared</b> and <b>UI</b> layer:
-{% highlight kotlin %} 
-data class RecipeUiModel (
-   val id: Long = 0,
-   val title: String,
-   val ingredients: List<Ingredient> = listOf(),
-   val instructions: List<Instruction> = listOf()
-)
+First, add some values to strings.xml in `res/values` folder:
+{% highlight xml %} 
+<resources>
+   <string name="name">Name</string>
+   <string name="amount">Amount</string>
+   <string name="metric">Metric</string>
+   <string name="description">Description</string>
+   <string name="save">Save</string>
+   <string name="title">What is the name of this dish?</string>
+</resources>
 {% endhighlight %} 
 
-
-Go to `shared` -> `remote` -> `RecipesRemoteSource.kt` and add `getRecipe()`:
-
-{% highlight kotlin %} 
-suspend fun getRecipe(id: Long) = recipesApi.getRecipe(id)
-{% endhighlight %} 
-
-And use it in `RecipeRepository`:
+In <b>RecipeDetailsScreen.kt</b> use the new `RecipeDetailsViewModel`:
 
 {% highlight kotlin %} 
-suspend fun getRecipe(id: Long) : RecipeResponse = recipeRemoteSource.getRecipe(id)
-{% endhighlight %} 
+   val viewModel = remember { RecipeDetailsViewModel(recipeId) }
+   val recipe by viewModel.recipe.collectAsState()
+{% endhighlight %}
 
-Next, we will adjust our models so that we can use them for our UI as well.<br>
-In the best case scenario you want to create UiModels and use them to display data, but in this tutorial we’ll just make `id` nullable for our shared models (except `RecipeResponse`, because it cannot arrive without id).<br>
-Also rename `Recipe` to `RecipeRequest` for clarity:
-
-{% highlight kotlin %} 
-@Serializable
-data class RecipeRequest (
-   val id: Long? = 0,
-   val title: String,
-   val ingredients: List<Ingredient>,
-   val instructions: List<Instruction>
-)
-
-@Serializable
-data class Ingredient(
-   val id: Long? = 0,
-   val name: String,
-   val amount: Double,
-   val metric: String
-
-)
-@Serializable
-data class Instruction(
-   val id: Long? = 0,
-   val order: Int,
-   var description: String,
-)
-{% endhighlight %} 
-
-Then create helper functions to transform your `RecipeResponse` to `RecipeUiModel` and back:
+Add an `upload` state and react to its changes:
 
 {% highlight kotlin %} 
-fun RecipeResponse.toRecipeUiModel() = RecipeUiModel(
-   id = id,
-   title = title,
-   ingredients = ingredients,
-   instructions = instructions
-)
+val upload by viewModel.upload.collectAsState()
 
-fun RecipeUiModel.toRecipeRequest() = RecipeRequest(
-   id = id,
-   title = title,
-   ingredients = ingredients,
-   instructions = instructions
-)
-{% endhighlight %} 
-
-
-Now in `shared`->`viewmodel` folder add `RecipeDetailsViewModel.kt`.<br>
-Here create an `EditRecipeChangeListener` to help the `ViewModel` observe the changes in the user interface:
-
-{% highlight kotlin %} 
-interface EditRecipeChangeListener { [1]
-   fun onTitleChanged(title: String)
-   fun onIngredientsChanged(ingredient: Ingredient)
-   fun onInstructionsChanged(instruction: Instruction)
+if (upload){
+   upPress()
+   viewModel.resetUpload()
 }
 {% endhighlight %} 
 
-And finally add the `RecipeDetailsViewModel` itself:
+Adjust the `Scaffold` to have a scrolling state and add `Edit` fields in case when the `recipeId` is `null` (i.e. we want to add a new recipe):
 
 {% highlight kotlin %} 
-class RecipeDetailsViewModel(private val id: Long?) : CoroutineViewModel(), KoinComponent, EditRecipeChangeListener { [2]
-   private val recipeRepository: RecipeRepository by inject()
+val scrolling = Modifier.verticalScroll(rememberScrollState())
 
-   private val _recipe = MutableStateFlow(EditRecipeUiModel()) [3]
-   val recipe: StateFlow<EditRecipeUiModel> = _recipe
-
-   init {
-      id?.let { getRecipe(it) } [4]
-   }
-
-   fun getRecipe(id: Long) {
-   coroutineScope.launch {
-       _recipe.value = recipeRepository.getRecipe(id).toRecipeUiModel()[5]
-   }
-}
-
-
-   @Suppress("unused")
-fun observeRecipe(onChange: (RecipeUiModel?) -> Unit) { [6]
-   recipe.onEach {
-       onChange(it)
-   }.launchIn(coroutineScope)
-}
-
-
-  override fun onTitleChanged(title: String) { [7]
-   _recipe.value = _recipe.value?.copy(title = title)
-
-}
-
-override fun onIngredientsChanged(ingredient: Ingredient) {
-   val ingredients = _recipe.value?.ingredients
-   _recipe.value = _recipe.value?.copy(ingredients = ingredients?.plus(ingredient) ?: listOf(ingredient))
-
-}
-
-override fun onInstructionsChanged(instruction: Instruction) {
-   val instructions = _recipe.value?.instructions
-   _recipe.value = _recipe.value?.copy(instructions = instructions?.plus(instruction) ?: listOf(instruction))
-
-}
-{% endhighlight %} 
-
-
-<b>[1]</b> We created an interface to react to UI changes<br>
-<b>[2]</b> `RecipeDetailsViewModel` implements this interface<br>
-<b>[3]</b> The `ViewModel` also holds the mutable state flow of the `recipe`, which we’ll display on the platform side<br>
-<b>[4]</b> If we have a `recipeId`, we’ll load it from our backend, otherwise start with an empty new recipe<br>
-<b>[5]</b> Transform `RecipeResponse` to `RecipeUiModel`<br>
-<b>[6]</b> This method just like in `RecipesViewModel` will be used to observe the `recipe` flow from iOS<br>
-<b>[7]</b> These overridden methods belong to `EditRecipeChangeListener` interface. Here you modify the data in the Recipe `StateFlow`, which passes the newest data to the UI<br>
-
-To edit or create a recipe add an appropriate function in `shared` -> `RecipesApi`:
-{% highlight kotlin %} 
-suspend fun postRecipe(recipe: Recipe): Long? {
-   try{
-       return client.post {
-           json()
-           apiUrl(RECIPES_BASE_URL)
-           setBody(body)
-       }.body()
-   } catch (e: Exception){
-       return null
-   }
-}
-{% endhighlight %} 
-
-
-Use it in `RecipesRemoteSource`:
-{% highlight kotlin %} 
-suspend fun postRecipe(recipe: Recipe) = recipesApi.postRecipe(recipe)
-{% endhighlight %} 
-
-Add this to `RecipeRepository`:
-{% highlight kotlin %} 
-suspend fun postRecipe(recipe: Recipe): Long?  = recipeRemoteSource.postRecipe(recipe)
-{% endhighlight %} 
-
-In `RecipeDetailsViewModel`:
-{% highlight kotlin %} 
-fun saveRecipe() {
-   coroutineScope.launch {
-       recipe.value?.let {
-           if (it.title.isNotEmpty() && it.ingredients.isNotEmpty() && it.instructions.isNotEmpty()){
-               val result = recipeRepository.postRecipe(it.toRecipeRequest())[1]
-               result?.let { _upload.value = true } [2]
+Scaffold(
+   topBar = { TopBar(upPress = upPress) })
+{
+   Column(
+       modifier = scrolling.padding(8.dp),
+       horizontalAlignment = Alignment.CenterHorizontally
+   ) {
+       HeaderImage(image = placeholder)
+       recipeId?.let { recipe?.title?.let { Title(it) } } ?: EditTitle(changeListener = viewModel, title = recipe?.title)
+       SectionHeader(title = "Ingredients")
+       recipeId?.let { recipe?.ingredients?.let { Ingredients(it)} } ?: EditIngredients(changeListener = viewModel, items = recipe?.ingredients)
+       SectionHeader(title = "Instructions")
+       recipeId?.let { recipe?.instructions?.let { Instructions(it) }} ?: EditInstructions(changeListener = viewModel, items = recipe?.instructions)
+       if (recipeId == null){
+           SubmitButton {
+               viewModel.saveRecipe()
            }
        }
    }
 }
 {% endhighlight %} 
 
-<b>[1]</b> Transform `RecipeUiModel` to `RecipeRequest`<br>
-<b>[2]</b> Use the result value to send a signal back to the UI<br>
-
-Here we also add the `upload` lever to know when the new recipe was successfully uploaded, so that we can go back to the recipe list.<br>
-Add the following to the `RecipeDetailsViewModel`:
+With the <b>Submit</b> button we’ll send the recipe data to backend:
 
 {% highlight kotlin %} 
-private val _upload = MutableStateFlow<Boolean>(false)
-val upload: StateFlow<Boolean> = _upload
-
-@Suppress("unused")
-fun observeUpload(onChange: (Boolean?) -> Unit) {
-   upload.onEach {
-       onChange(it)
-   }.launchIn(coroutineScope)
-}
-
-fun resetUpload(){
-   _upload.value = false
+@Composable
+fun SubmitButton(
+   onClick: () -> Unit){
+   ExtendedFloatingActionButton(
+       text = { Text(text = stringResource(id = R.string.save))},
+       shape = RoundedCornerShape(51),
+       onClick = onClick,
+       modifier = Modifier
+           .fillMaxWidth()
+           .padding(vertical = 4.dp)
+   )
 }
 {% endhighlight %} 
 
+These new "edit recipe" components control user interactions with the input fields and pass the appropriate changes to the view model. <br>
+Here’s an example of `EditInstructions`:
 
-The Recipe Details View Model is ready!<br>
- Now we can add new recipes to the database!<br>
-<b>In the next step</b> we’ll <b>connect</b> this <b>ViewModel</b> to our Android <b>compose UI</b>.
+{% highlight kotlin %} 
+@Composable
+private fun EditInstructions(changeListener: EditRecipeChangeListener, items: List<Instruction>?) {
+   var isEdited by remember { mutableStateOf(false) } [1]
+   var description by remember { mutableStateOf("") } [2]
+
+   val onDescriptionChanged = { value: String ->
+       description = value
+   }
+
+   val onInstructionAdded = {
+       isEdited = true
+       if (description.isNotEmpty()){
+           changeListener.onInstructionsChanged(Instruction(order = items?.size?.plus(1) ?: 1, description = description))
+           description = ""
+       }
+   } [3]
+
+  Instructions(items = items) [4]
+   if (isEdited){
+       NewInstruction(description = description, onDescriptionChanged = onDescriptionChanged)
+   } [5]
+   AddItemButton(onAddInstruction = onInstructionAdded) [6]
+}
+{% endhighlight %} 
+
+<b>[1]</b> Keep track of whether the `Instructions` section is being edited<br>
+<b>[2]</b> Holds the current state of the instruction description, which is manipulated by the user<br>
+<b>[3]</b> The `onInstructionAdded` callback follows the `AddItemButton` click and activates a new description field tor user input. When the user clicks the button again it adds the previous instruction to the list of instructions for this recipe via `viewModel.onInstructionsChanged()`<br>
+<b>[4]</b> Shows all the instructions that have already been added<br>
+<b>[5]</b> Under all the added instructions we have a field for user input, which is shown when `isEdited` was triggered<br>
+<b>[6]</b> At the bottom of the section there’s an `AddItemButton` which allows the user to add a new instruction<br>
+
+{% highlight kotlin %} 
+@Composable
+private fun AddItemButton(onAddInstruction: () -> Unit = {}) {
+   IconButton(onClick = onAddInstruction) {
+       Icon(
+           painter = rememberAsyncImagePainter(R.drawable.ic_add),
+           contentDescription = null,
+           modifier = Modifier.clip(CircleShape))
+   }
+}
+{% endhighlight %} 
+
+<u><b>Check the repository for the full code and other components like EditTitle, EditIngredients and others.</b></u><br> [KMPizza Repo](https://github.com/hlnstepanova/kmpizza-repo)
+
+Once your UI is ready, run the project.<br>
+You’ll encounter an error saying that you received an unexpected variable in your JSON Response. That’s because you have images in the json `RecipeResponse`, but the `Recipe` entity on the app side doesn’t. <br>
+
+Let’s fix it by temporarily changing the types. This way we’ll avoid errors with images, which we’ll add later on to the backend.
+
+{% highlight kotlin %} 
+internal class RecipeRemoteSource(
+   private val recipesApi: RecipesApi
+) {
+
+   suspend fun getRecipes() = recipesApi.getRecipes().map { it.toRecipe() }
+   suspend fun getRecipe(id: Long) = recipesApi.getRecipe(id).toRecipe()
+   suspend fun postRecipe(recipe: Recipe) = recipesApi.postRecipe(recipe)
+}
+
+fun RecipeResponse.toRecipe() = Recipe (id = id, title = title, ingredients = ingredients, instructions = instructions)
+{% endhighlight %} 
+
+Now it's fixed and the Android UI is ready. <br>
+<b>In the next</b> step we'll move on to playing with <b>Swift UI</b>.

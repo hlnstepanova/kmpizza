@@ -162,5 +162,7 @@ Here we create an `AppDelegate` and while doing it, initialize Koin with this li
 Now run the app again.<br>
 It may take a while, but you’ll finally see the “Pizza dough” item in our one-item-list.<br>
 Yay! We’ve moved one step forward. <br>
-<iframe src="https://giphy.com/embed/3oKIPdJxNVK86FzNiE" width="480" height="324" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/papajohns-dancing-pizza-3oKIPdJxNVK86FzNiE"></a></p>
+
+<img src="{{site.baseurl}}/assets/images/step-15/4.png" alt="happy flying pizza" width="250"/>
+
 <b>In the next step</b> we’ll come up with a better design and learn to use <b>KMP image libraries</b>.

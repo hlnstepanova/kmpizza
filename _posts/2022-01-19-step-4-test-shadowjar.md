@@ -87,7 +87,7 @@ For example, we can override the port that we specified in `application.conf`:
 Then open your web browser at `localhost:9000/hello`.
 If it greets you, then it’s a good sign!
 
-<img src="https://thumbs.gfycat.com/FancyOrangeArctichare-max-1mb.gif" alt="hello" width="150"/> 
+<img src="{{site.baseurl}}/assets/images/step-4/3.gif" alt="hello" width="200"/> 
 
 Congrats, we’ve created a simple backend REST API with our first get function!<br>
 You can reward yourself with a slice of pizza now.
